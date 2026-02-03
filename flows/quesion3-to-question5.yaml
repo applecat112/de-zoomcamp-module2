@@ -1,0 +1,47 @@
+id: q3_5_process_data
+namespace: zoomcamp-module-2-hw
+description: |
+  This is ELT pipeline to store NYC taxi data in GCP
+  CSV data used here comes from: https://github.com/DataTalksClub/nyc-tlc-data/releases
+
+tasks:
+  - id: taxi_type_loop
+    type: io.kestra.plugin.core.flow.ForEach
+    values:
+      - "yellow"
+      - "green"
+    tasks:
+      - id: year_month_loop
+        type: io.kestra.plugin.core.flow.ForEach
+        values:
+          - { year: "2020", month: "01" }
+          - { year: "2020", month: "02" }
+          - { year: "2020", month: "03" }
+          - { year: "2020", month: "04" }
+          - { year: "2020", month: "05" }
+          - { year: "2020", month: "06" }
+          - { year: "2020", month: "07" }
+          - { year: "2020", month: "08" }
+          - { year: "2020", month: "09" }
+          - { year: "2020", month: "10" }
+          - { year: "2020", month: "11" }
+          - { year: "2020", month: "12" }
+          - { year: "2021", month: "01" }
+          - { year: "2021", month: "02" }
+          - { year: "2021", month: "03" }
+          - { year: "2021", month: "04" }
+          - { year: "2021", month: "05" }
+          - { year: "2021", month: "06" }
+          - { year: "2021", month: "07" }
+        tasks:
+          - id: call_process
+            type: io.kestra.plugin.core.flow.Subflow
+            namespace: zoomcamp-module-2-hw
+            flowId: 08_gcp_taxi
+            inputs:
+              taxi: "{{parent.taskrun.value}}"
+              year: "{{fromJson(taskrun.value).year}}"
+              month: "{{fromJson(taskrun.value).month}}"
+  - id: final_return
+    type: io.kestra.plugin.core.debug.Return
+    format: "All done!"

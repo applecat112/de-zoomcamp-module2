@@ -1,0 +1,39 @@
+id: sample_logger
+namespace: zoomcamp-module-2-hw
+description: |
+  Just logs the inputs. This is for testing the forEach loop.
+
+inputs:
+  - id: taxi
+    type: SELECT
+    displayName: Select taxi type
+    values: [yellow, green]
+    defaults: green
+
+  - id: year
+    type: SELECT
+    displayName: Select year
+    values: ["2019", "2020", "2021"]
+    defaults: "2019"
+
+  - id: month
+    type: SELECT
+    displayName: Select month
+    values: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
+    defaults: "01"
+
+variables:
+  file: "{{inputs.taxi}}_tripdata_{{inputs.year}}-{{inputs.month}}.csv"
+  gcs_file: "gs://GCP_BUCKET_NAME/{{vars.file}}"
+  table: "GCP_DATASET.{{inputs.taxi}}_tripdata_{{inputs.year}}_{{inputs.month}}"
+
+tasks:
+  - id: log_inputs
+    type: io.kestra.plugin.core.debug.Return
+    format: |
+      Taxi: {{inputs.taxi}}
+      Year: {{inputs.year}}
+      Month: {{inputs.month}}
+      File: {{render(vars.file)}}
+      GCS File: {{render(vars.gcs_file)}}
+      Table: {{render(vars.table)}}

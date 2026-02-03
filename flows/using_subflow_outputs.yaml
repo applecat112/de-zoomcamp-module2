@@ -1,0 +1,32 @@
+id: using_subflow_outputs
+namespace: zoomcamp-trial
+description: |
+  This is a sample pipeline to see how to use subflow outputs
+
+tasks:
+  - id: taxi_type_loop
+    type: io.kestra.plugin.core.flow.ForEach
+    values:
+      - "yellow"
+      - "green"
+    tasks:
+      - id: year_month_loop
+        type: io.kestra.plugin.core.flow.ForEach
+        values:
+          - { year: "2020", month: "01" }
+          - { year: "2020", month: "02" }
+          - { year: "2020", month: "03" }
+        tasks:
+          - id: call_process
+            type: io.kestra.plugin.core.flow.Subflow
+            namespace: zoomcamp-trial
+            flowId: sample_output_subflow
+            inputs:
+              taxi: "{{parent.taskrun.value}}"
+              year: "{{fromJson(taskrun.value).year}}"
+              month: "{{fromJson(taskrun.value).month}}"
+  - id: sum_outputs
+    type: io.kestra.plugin.core.debug.Return
+    format: |
+      {% set total = outputs.call_process | json | jq('[.[] | .[] | .outputs.final_number] | add') | first %}
+      The Total Sum is: {{ total }}
