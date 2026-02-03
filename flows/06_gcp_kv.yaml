@@ -1,5 +1,5 @@
 id: 06_gcp_kv
-namespace: zoomcamp
+namespace: zoomcamp-module-2-hw
 
 tasks:
   - id: gcp_project_id
